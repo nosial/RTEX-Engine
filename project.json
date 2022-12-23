@@ -1,0 +1,67 @@
+{
+    "project": {
+        "compiler": {
+            "extension": "php",
+            "minimum_version": "8.0",
+            "maximum_version": "8.1"
+        },
+        "update_source": {
+            "source": "nosial/cognize.rtex-engine@n64",
+            "repository": {
+                "name": "n64",
+                "type": "gitlab",
+                "host": "git.n64.cc",
+                "ssl": true
+            }
+        },
+        "options": []
+    },
+    "assembly": {
+        "name": "Real-Time Execution Engine",
+        "descritpion": "Real-Time Execution Engine",
+        "company": "Nosial",
+        "package": "net.nosial.rtex",
+        "version": "1.0.0",
+        "uuid": "306c25c2-825f-11ed-b106-ad30777c00c3"
+    },
+    "build": {
+        "source_path": "src",
+        "default_configuration": "release",
+        "define_constants": {
+            "ASSEMBLY_NAME": "%ASSEMBLY.NAME%",
+            "ASSEMBLY_PACKAGE": "%ASSEMBLY.PACKAGE%",
+            "ASSEMBLY_VERSION": "%ASSEMBLY.VERSION%",
+            "ASSEMBLY_UID": "%ASSEMBLY.UID%"
+        },
+        "dependencies": [
+            {
+                "name": "net.nosial.optslib",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.opts=latest@n64"
+            },
+            {
+                "name": "net.nosial.loglib",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "nosial/libs.log=latest@n64"
+            }
+        ],
+        "configurations": [
+            {
+                "name": "debug",
+                "output_path": "build/debug",
+                "define_constants": {
+                    "DEBUG": "1"
+                }
+            },
+            {
+                "name": "release",
+                "output_path": "build/release",
+                "define_constants": {
+                    "DEBUG": "0"
+                }
+            }
+        ]
+    }
+}
