@@ -1,0 +1,7 @@
+{
+  "type": "set",
+  "_": {
+    "variable": "foo",
+    "value": "bar"
+  }
+}

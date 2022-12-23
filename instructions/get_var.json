@@ -1,0 +1,6 @@
+{
+  "type": "get",
+  "_": {
+    "variable": "foo"
+  }
+}
