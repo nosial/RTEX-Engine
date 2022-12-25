@@ -12,17 +12,17 @@
     use RTEX\Exceptions\Core\UnsupportedVariableType;
     use RTEX\Interfaces\InstructionInterface;
 
-    class SetVariable implements InstructionInterface
+    class ArrayGet implements InstructionInterface
     {
         /**
-         * The name of the variable to set
+         * The array to read from
          *
          * @var mixed
          */
-        private $Variable;
+        private $Array;
 
         /**
-         * The value to set the variable to
+         * The query to use to read from the array
          *
          * @var mixed
          */
@@ -35,7 +35,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::SetVariable;
+            return InstructionType::ArrayGet;
         }
 
 
@@ -44,9 +44,9 @@
          * @noinspection PhpMissingReturnTypeInspection
          * @noinspection PhpUnused
          */
-        public function getVariable()
+        public function getArray()
         {
-            return $this->Variable;
+            return $this->Array;
         }
 
         /**
@@ -55,9 +55,9 @@
          * @throws MalformedInstructionException
          * @noinspection PhpMissingParamTypeInspection
          */
-        public function setVariable($variable): void
+        public function setArray($variable): void
         {
-            $this->Variable = InstructionBuilder::fromRaw($variable);
+            $this->Array = InstructionBuilder::fromRaw($variable);
         }
 
         /**
@@ -89,7 +89,7 @@
         public function toArray(): array
         {
             return InstructionBuilder::toRaw(self::getType(), [
-                'variable' => $this->Variable,
+                'array' => $this->Array,
                 'value' => $this->Value
             ]);
         }
@@ -103,7 +103,7 @@
         public static function fromArray(array $data): InstructionInterface
         {
             $instruction = new self();
-            $instruction->setVariable($data['variable'] ?? null);
+            $instruction->setArray($data['array'] ?? null);
             $instruction->setValue($data['value'] ?? null);
 
             return $instruction;
@@ -114,12 +114,25 @@
          * @return void
          * @throws UnsupportedVariableType
          */
-        public function eval(Engine $engine): void
+        public function eval(Engine $engine)
         {
-            $engine->getEnvironment()->setRuntimeVariable(
-                $engine->eval($this->Variable),
-                $engine->eval($this->Value)
-            );
+
+            $queryParts = explode('.', $engine->eval($this->Value));
+            $value = $engine->getEnvironment()->getRuntimeVariable($engine->eval($this->Array));
+
+            foreach ($queryParts as $queryPart)
+            {
+                if (is_array($value) && array_key_exists($queryPart, $value))
+                {
+                    $value = $value[$queryPart];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            return $value;
         }
 
         /**
@@ -129,8 +142,8 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (variable: %s, value: %s)',
-                Utilities::entityToString($this->Variable),
+                self::getType() . ' (array: %s, value: %s)',
+                Utilities::entityToString($this->Array),
                 Utilities::entityToString($this->Value)
             );
         }
