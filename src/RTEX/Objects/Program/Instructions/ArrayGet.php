@@ -8,8 +8,9 @@
     use RTEX\Classes\InstructionBuilder;
     use RTEX\Classes\Utilities;
     use RTEX\Engine;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\EvaluationException;
+    use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\KeyException;
     use RTEX\Interfaces\InstructionInterface;
 
     class ArrayGet implements InstructionInterface
@@ -51,8 +52,7 @@
 
         /**
          * @param mixed $variable
-         * @throws UnsupportedVariableType
-         * @throws MalformedInstructionException
+         * @throws InstructionException
          * @noinspection PhpMissingParamTypeInspection
          */
         public function setArray($variable): void
@@ -71,8 +71,7 @@
 
         /**
          * @param mixed $value
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          * @noinspection PhpMissingParamTypeInspection
          */
         public function setValue($value): void
@@ -84,7 +83,6 @@
          * Returns an array representation of the object
          *
          * @return array
-         * @throws UnsupportedVariableType
          */
         public function toArray(): array
         {
@@ -97,8 +95,7 @@
         /**
          * @param array $data
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public static function fromArray(array $data): InstructionInterface
         {
@@ -111,12 +108,12 @@
 
         /**
          * @param Engine $engine
-         * @return void
-         * @throws UnsupportedVariableType
+         * @return mixed
+         * @throws EvaluationException
+         * @throws KeyException
          */
-        public function eval(Engine $engine)
+        public function eval(Engine $engine): mixed
         {
-
             $queryParts = explode('.', $engine->eval($this->Value));
             $value = $engine->getEnvironment()->getRuntimeVariable($engine->eval($this->Array));
 
@@ -124,12 +121,10 @@
             {
                 if (is_array($value) && array_key_exists($queryPart, $value))
                 {
-                    $value = $value[$queryPart];
+                    return $value[$queryPart];
                 }
-                else
-                {
-                    return null;
-                }
+
+                throw new KeyException(sprintf('Key "%s" does not exist in array', $queryPart));
             }
 
             return $value;
@@ -137,7 +132,6 @@
 
         /**
          * @inheritDoc
-         * @throws UnsupportedVariableType
          */
         public function __toString(): string
         {
