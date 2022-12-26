@@ -37,4 +37,13 @@
          * @return mixed
          */
         public function eval(Engine $engine);
+
+        /**
+         * Returns a string representation of the instruction for debugging purposes
+         * this is not the same as the array representation, and is not intended to be
+         * used for serialization
+         *
+         * @return string
+         */
+        public function __toString(): string;
     }
