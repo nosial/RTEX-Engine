@@ -8,8 +8,9 @@
     use RTEX\Classes\InstructionBuilder;
     use RTEX\Classes\Utilities;
     use RTEX\Engine;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\EvaluationException;
+    use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\ZeroDivisionException;
     use RTEX\Interfaces\InstructionInterface;
 
     class Divide implements InstructionInterface
@@ -38,7 +39,6 @@
          * Returns an array representation of the instruction
          *
          * @return array
-         * @throws UnsupportedVariableType
          */
         public function toArray(): array
         {
@@ -53,8 +53,7 @@
          *
          * @param array $data
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public static function fromArray(array $data): InstructionInterface
         {
@@ -67,10 +66,14 @@
         /**
          * @param Engine $engine
          * @return int
-         * @throws UnsupportedVariableType
+         * @throws ZeroDivisionException
+         * @throws EvaluationException
          */
         public function eval(Engine $engine): int
         {
+            if ($this->B === 0)
+                throw new ZeroDivisionException(sprintf('Division by zero in %s', $this));
+
             return (intval($engine->eval($this->A)) / intval($engine->eval($this->B)));
         }
 
@@ -78,7 +81,6 @@
          * Returns the string representation of the instruction
          *
          * @return string
-         * @throws UnsupportedVariableType
          */
         public function __toString(): string
         {
@@ -103,8 +105,7 @@
          * Sets the value of A
          *
          * @param mixed $A
-         * @throws UnsupportedVariableType
-         * @throws MalformedInstructionException
+         * @throws InstructionException
          */
         public function setA(mixed $A): void
         {
@@ -125,8 +126,7 @@
          * Sets the value of B
          *
          * @param mixed $B
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public function setB(mixed $B): void
         {
