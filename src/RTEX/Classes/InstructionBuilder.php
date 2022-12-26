@@ -1,10 +1,8 @@
 <?php
-
     namespace RTEX\Classes;
 
     use RTEX\Abstracts\InstructionType;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\InstructionException;
     use RTEX\Interfaces\InstructionInterface;
     use RTEX\Objects\Program\Instructions\ArrayGet;
     use RTEX\Objects\Program\Instructions\Divide;
@@ -29,8 +27,7 @@
          *
          * @param $value
          * @return array|mixed|InstructionInterface|null
-         * @throws UnsupportedVariableType
-         * @throws MalformedInstructionException
+         * @throws InstructionException
          * @noinspection PhpMissingReturnTypeInspection
          */
         public static function fromRaw($value)
@@ -69,9 +66,10 @@
                     InstructionType::ArrayGet => ArrayGet::fromArray($value['_']),
 
                     // Default
-                    //default => throw new UnsupportedVariableType($value['type']),
+                    default => throw new InstructionException(sprintf('Unknown instruction type "%s"', $value['type'])),
                 };
             }
+
             // Recursive call if it's an array
             elseif(is_array($value))
             {
@@ -92,7 +90,6 @@
          * @param $type
          * @param $value
          * @return array
-         * @throws UnsupportedVariableType
          */
         public static function toRaw($type, $value): array
         {
@@ -107,8 +104,6 @@
          *
          * @param $name
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
          */
         public static function getVariable($name): InstructionInterface
         {
@@ -124,8 +119,6 @@
          * @param $name
          * @param $value
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
          */
         public static function setVariable($name, $value): InstructionInterface
         {
@@ -141,8 +134,6 @@
          * @param array $parameters
          * @param bool $fail_on_error
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
          */
         public static function invoke(string $method, array $parameters, bool $fail_on_error=true): InstructionInterface
         {
@@ -167,8 +158,6 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
          */
         public static function equals($a, $b): InstructionInterface
         {
@@ -186,8 +175,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function sum($a, $b): InstructionInterface
         {
@@ -205,8 +193,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function subtract($a, $b): InstructionInterface
         {
@@ -224,8 +211,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function multiply($a, $b): InstructionInterface
         {
@@ -243,8 +229,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function divide($a, $b): InstructionInterface
         {
@@ -262,8 +247,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function modulo($a, $b): InstructionInterface
         {
@@ -281,8 +265,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function power($a, $b): InstructionInterface
         {
@@ -300,8 +283,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function greaterThan($a, $b): InstructionInterface
         {
@@ -319,8 +301,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function greaterThanOrEquals($a, $b): InstructionInterface
         {
@@ -338,8 +319,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function lessThan($a, $b): InstructionInterface
         {
@@ -357,8 +337,7 @@
          * @param $a
          * @param $b
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @noinspection PhpUnused
          */
         public static function lessThanOrEquals($a, $b): InstructionInterface
         {

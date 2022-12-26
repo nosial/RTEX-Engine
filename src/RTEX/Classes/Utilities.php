@@ -2,13 +2,9 @@
 
     namespace RTEX\Classes;
 
-    use RTEX\Abstracts\InstructionType;
-    use RTEX\Abstracts\VariableTypes;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Abstracts\VariableType;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
-    use RTEX\Objects\Program\Instructions\GetVariable;
-    use RTEX\Objects\Program\Instructions\SetVariable;
 
     class Utilities
     {
@@ -17,65 +13,87 @@
          *
          * @param $input
          * @return string
-         * @throws UnsupportedVariableType
+         * @throws TypeException
          */
         public static function determineType($input): string
         {
             if ($input instanceof InstructionInterface)
-                return VariableTypes::Instruction;
+                return VariableType::Instruction;
             if (is_string($input))
-                return VariableTypes::String;
+                return VariableType::String;
             if (is_int($input))
-                return VariableTypes::Integer;
+                return VariableType::Integer;
             if (is_float($input))
-                return VariableTypes::Float;
+                return VariableType::Float;
             if (is_bool($input))
-                return VariableTypes::Boolean;
+                return VariableType::Boolean;
+            if (is_array($input))
+                return VariableType::Array;
             if (is_null($input))
-                return VariableTypes::Null;
+                return VariableType::Null;
 
-            throw new UnsupportedVariableType(gettype($input));
+            throw new TypeException(gettype($input));
         }
 
         /**
          * Returns a supported variable type to an array representation
+         * or a single value if it's not an array or an instruction
          *
          * @param $input
          * @return array|mixed
-         * @throws UnsupportedVariableType
+         * @noinspection PhpMissingReturnTypeInspection
          */
         public static function toArray($input)
         {
-            return match (self::determineType($input))
+            if($input instanceof InstructionInterface)
+                return $input->toArray();
+
+            if(is_array($input))
             {
-                VariableTypes::Instruction => $input->toArray(),
-                default => $input,
-            };
+                $output = [];
+                foreach($input as $key => $value)
+                    $output[$key] = self::toArray($value);
+                return $output;
+            }
+
+            return $input;
         }
 
         /**
-         * Constructs an instruction from an array representation
+         * Returns a string representation of a variable type
+         * or an instruction type if it's an instruction
          *
-         * @param array $array
-         * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * This cannot be used as a method of serialization
+         *
+         * @param $input
+         * @return string
          */
-        public static function constructInstruction(array $array): InstructionInterface
+        public static function entityToString($input): string
         {
-            if(!isset($array['type']))
-                throw new MalformedInstructionException(sprintf('Instruction type not specified'));
-            if(!isset($array['_']))
-                throw new MalformedInstructionException(sprintf('Instruction data not specified'));
+            /** @var InstructionInterface $input */
+            if($input instanceof InstructionInterface)
+                return (string)$input;
 
-            switch($array['type'])
+            if(is_array($input))
             {
-                case InstructionType::GetVariable:
-                    return GetVariable::fromArray($array['_']);
-                case InstructionType::SetVariable:
-                    return SetVariable::fromArray($array['_']);
-                default:
-                    throw new MalformedInstructionException(sprintf('Instruction type "%s" not supported', $array['type']));
+                $output = [];
+                foreach($input as $key => $value)
+                    $output[$key] = self::entityToString($value);
+                return json_encode($output, JSON_UNESCAPED_SLASHES);
             }
+
+            if(is_string($input))
+                return "'$input'";
+            if(is_int($input))
+                return 'int(' . $input . ')';
+            if(is_float($input))
+                return 'float(' . $input . ')';
+            if(is_bool($input))
+                return $input ? 'True' : 'False';
+            if(is_null($input))
+                return 'NULL';
+
+            return 'Unknown';
         }
+
     }

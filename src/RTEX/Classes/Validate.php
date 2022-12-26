@@ -3,8 +3,6 @@
     namespace RTEX\Classes;
 
     use Exception;
-    use RTEX\Abstracts\VariableTypes;
-    use RTEX\Interfaces\InstructionInterface;
 
     class Validate
     {
