@@ -16,7 +16,7 @@
         {
             try
             {
-                Utilities::determineType($type);
+                Utilities::getType($type);
             }
             catch(Exception $e)
             {
@@ -25,5 +25,17 @@
             }
 
             return true;
+        }
+
+        /**
+         * Validates the input with a regex pattern
+         *
+         * @param string $input
+         * @param string $pattern
+         * @return bool
+         */
+        public static function validateRegex(string $input, string $pattern): bool
+        {
+            return preg_match($pattern, $input) === 1;
         }
     }
