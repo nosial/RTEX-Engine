@@ -11,6 +11,7 @@
     use RTEX\Exceptions\EvaluationException;
     use RTEX\Exceptions\InstructionException;
     use RTEX\Exceptions\Runtime\KeyException;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
     class ArrayGet implements InstructionInterface
@@ -111,23 +112,33 @@
          * @return mixed
          * @throws EvaluationException
          * @throws KeyException
+         * @throws TypeException
          */
         public function eval(Engine $engine): mixed
         {
-            $queryParts = explode('.', $engine->eval($this->Value));
-            $value = $engine->getEnvironment()->getRuntimeVariable($engine->eval($this->Array));
+            $value = $engine->eval($this->Value);
+            $array = $engine->eval($this->Array);
 
-            foreach ($queryParts as $queryPart)
+            if (!is_array($array))
+                throw new KeyException(sprintf('Cannot read from non-array value of type %s', Utilities::getType($array)));
+            if(!is_string($value) && !is_int($value))
+                throw new TypeException(sprintf('Cannot read from array with non-string value %s', Utilities::getType($value)));
+
+            $keys = explode('.', $value);
+            $result = $array;
+            foreach ($keys as $key)
             {
-                if (is_array($value) && array_key_exists($queryPart, $value))
+                if (is_array($result) && array_key_exists($key, $result))
                 {
-                    return $value[$queryPart];
+                    $result = $result[$key];
                 }
-
-                throw new KeyException(sprintf('Key "%s" does not exist in array', $queryPart));
+                else
+                {
+                    throw new KeyException(sprintf('Key "%s" does not exist in array (%s)', $key, $value));
+                }
             }
 
-            return $value;
+            return $result;
         }
 
         /**
