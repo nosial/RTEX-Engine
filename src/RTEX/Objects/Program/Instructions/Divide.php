@@ -10,6 +10,7 @@
     use RTEX\Engine;
     use RTEX\Exceptions\EvaluationException;
     use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Exceptions\Runtime\ZeroDivisionException;
     use RTEX\Interfaces\InstructionInterface;
 
@@ -66,15 +67,23 @@
         /**
          * @param Engine $engine
          * @return int
-         * @throws ZeroDivisionException
          * @throws EvaluationException
+         * @throws TypeException
+         * @throws ZeroDivisionException
          */
         public function eval(Engine $engine): int
         {
-            if ($this->B === 0)
+            $a = $engine->eval($this->A);
+            $b = $engine->eval($this->B);
+
+            if(!(is_int($a) || is_float($a) || is_double($a)))
+                throw new TypeException('Cannot divide a non-numeric value');
+            if(!(is_int($b) || is_float($b) || is_double($b)))
+                throw new TypeException('Cannot divide by a non-numeric value');
+            if ($b === 0)
                 throw new ZeroDivisionException(sprintf('Division by zero in %s', $this));
 
-            return (intval($engine->eval($this->A)) / intval($engine->eval($this->B)));
+            return (intval($a) / intval($b));
         }
 
         /**
