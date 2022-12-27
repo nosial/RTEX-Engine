@@ -2,7 +2,7 @@
 
     namespace RTEX\Abstracts;
 
-    abstract class VariableTypes
+    abstract class VariableType
     {
         const String = 'string';
 
@@ -12,19 +12,19 @@
 
         const Boolean = 'boolean';
 
+        const Array = 'array';
+
         const Null = 'null';
 
         const Instruction = 'instruction';
-
-        const InstructionList = 'i_instruction';
 
         const All = [
             self::String,
             self::Integer,
             self::Float,
             self::Boolean,
+            self::Array,
             self::Null,
-            self::Instruction,
-            self::InstructionList
+            self::Instruction
         ];
     }
