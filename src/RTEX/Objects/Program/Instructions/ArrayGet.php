@@ -5,8 +5,10 @@
     namespace RTEX\Objects\Program\Instructions;
 
     use RTEX\Abstracts\InstructionType;
+    use RTEX\Abstracts\RegexPatterns;
     use RTEX\Classes\InstructionBuilder;
     use RTEX\Classes\Utilities;
+    use RTEX\Classes\Validate;
     use RTEX\Engine;
     use RTEX\Exceptions\EvaluationException;
     use RTEX\Exceptions\InstructionException;
@@ -123,6 +125,8 @@
                 throw new KeyException(sprintf('Cannot read from non-array value of type %s', Utilities::getType($array)));
             if(!is_string($value) && !is_int($value))
                 throw new TypeException(sprintf('Cannot read from array with non-string value %s', Utilities::getType($value)));
+            if(!Validate::validateRegex($value, RegexPatterns::ArrayQuery))
+                throw new KeyException(sprintf('Cannot read from array with invalid query %s', $value));
 
             $keys = explode('.', $value);
             $result = $array;
