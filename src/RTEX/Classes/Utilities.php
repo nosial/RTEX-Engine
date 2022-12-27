@@ -15,7 +15,7 @@
          * @return string
          * @throws TypeException
          */
-        public static function determineType($input): string
+        public static function getType($input): string
         {
             if ($input instanceof InstructionInterface)
                 return VariableType::Instruction;
@@ -25,6 +25,8 @@
                 return VariableType::Integer;
             if (is_float($input))
                 return VariableType::Float;
+            if (is_double($input))
+                return VariableType::Double;
             if (is_bool($input))
                 return VariableType::Boolean;
             if (is_array($input))
@@ -88,6 +90,8 @@
                 return 'int(' . $input . ')';
             if(is_float($input))
                 return 'float(' . $input . ')';
+            if(is_double($input))
+                return 'double(' . $input . ')';
             if(is_bool($input))
                 return $input ? 'True' : 'False';
             if(is_null($input))

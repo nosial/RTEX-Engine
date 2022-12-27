@@ -10,6 +10,8 @@
 
         const Float = 'float';
 
+        const Double = 'double';
+
         const Boolean = 'boolean';
 
         const Array = 'array';
@@ -22,6 +24,7 @@
             self::String,
             self::Integer,
             self::Float,
+            self::Double,
             self::Boolean,
             self::Array,
             self::Null,
