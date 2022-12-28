@@ -122,9 +122,9 @@
             $array = $engine->eval($this->Array);
 
             if (!is_array($array))
-                throw new KeyException(sprintf('Cannot read from non-array value of type %s', Utilities::getType($array)));
+                throw new KeyException(sprintf('Cannot read from non-array value of type %s', Utilities::getType($array, true)));
             if(!is_string($value) && !is_int($value))
-                throw new TypeException(sprintf('Cannot read from array with non-string value %s', Utilities::getType($value)));
+                throw new TypeException(sprintf('Cannot read from array with non-string value %s', Utilities::getType($value, true)));
             if(!Validate::validateRegex($value, RegexPatterns::ArrayQuery))
                 throw new KeyException(sprintf('Cannot read from array with invalid query %s', $value));
 
