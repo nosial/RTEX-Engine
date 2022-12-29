@@ -66,14 +66,13 @@
          * @param Engine $engine
          * @return bool
          * @throws EvaluationException
-         * @throws EvaluationException
          */
         public function eval(Engine $engine): bool
         {
             $a = $engine->eval($this->A);
             $b = $engine->eval($this->B);
 
-            return $a === $b;
+            return ($a === $b);
         }
 
         /**
