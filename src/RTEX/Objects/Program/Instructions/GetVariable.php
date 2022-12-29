@@ -8,8 +8,10 @@
     use RTEX\Classes\InstructionBuilder;
     use RTEX\Classes\Utilities;
     use RTEX\Engine;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\EvaluationException;
+    use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\NameException;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
     class GetVariable implements InstructionInterface
@@ -19,7 +21,7 @@
          *
          * @var mixed
          */
-        private $Variable;
+        private $VariableName;
 
         /**
          * Returns the type of instruction
@@ -36,33 +38,42 @@
          * Returns
          *
          * @return mixed
-         * @noinspection PhpMissingReturnTypeInspection
          * @noinspection PhpUnused
          */
-        public function getVariable()
+        public function getVariableName(): mixed
         {
-            return $this->Variable;
+            return $this->VariableName;
         }
 
         /**
          * @param mixed $variable
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          * @noinspection PhpMissingParamTypeInspection
          */
-        public function setVariable($variable): void
+        public function setVariableName($variable): void
         {
-            $this->Variable = InstructionBuilder::fromRaw($variable);
+            $this->VariableName = InstructionBuilder::fromRaw($variable);
         }
 
         /**
-         * @inheritDoc
-         * @throws UnsupportedVariableType
+         * @param Engine $engine
+         * @return mixed
+         * @throws EvaluationException
+         * @throws NameException
+         * @throws TypeException
          */
-        public function eval(Engine $engine)
+        public function eval(Engine $engine): mixed
         {
+            $variable = $engine->eval($this->VariableName);
+
+            if(!is_string($variable))
+                throw new TypeException(sprintf('Expected string, got %s', Utilities::getType($variable)));
+
+            if (!$engine->getEnvironment()->variableExists($variable))
+                throw new NameException("Variable '$variable' is not defined");
+            
             return $engine->getEnvironment()->getRuntimeVariable(
-                $engine->eval($this->Variable)
+                $engine->eval($this->VariableName)
             );
         }
 
@@ -70,12 +81,11 @@
          * Returns an array representation of the object
          *
          * @return array
-         * @throws UnsupportedVariableType
          */
         public function toArray(): array
         {
             return InstructionBuilder::toRaw(self::getType(), [
-                'variable' => $this->Variable
+                'name' => $this->VariableName
             ]);
         }
 
@@ -84,26 +94,24 @@
          *
          * @param array $data
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public static function fromArray(array $data): InstructionInterface
         {
             $instruction = new self();
-            $instruction->setVariable($data['variable'] ?? null);
+            $instruction->setVariableName($data['name'] ?? null);
 
             return $instruction;
         }
 
         /**
          * @inheritDoc
-         * @throws UnsupportedVariableType
          */
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (variable: %s)',
-                Utilities::entityToString($this->Variable)
+                self::getType() . ' (name: %s)',
+                Utilities::entityToString($this->VariableName)
             );
         }
     }
