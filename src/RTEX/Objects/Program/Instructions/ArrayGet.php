@@ -42,13 +42,11 @@
             return InstructionType::ArrayGet;
         }
 
-
         /**
          * @return mixed
-         * @noinspection PhpMissingReturnTypeInspection
          * @noinspection PhpUnused
          */
-        public function getArray()
+        public function getArray(): mixed
         {
             return $this->Array;
         }
@@ -65,9 +63,8 @@
 
         /**
          * @return mixed
-         * @noinspection PhpMissingReturnTypeInspection
          */
-        public function getValue()
+        public function getValue(): mixed
         {
             return $this->Value;
         }
