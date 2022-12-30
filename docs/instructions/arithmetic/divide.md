@@ -1,11 +1,11 @@
-# divide
+# div
 
 Divide two numbers.
 
 ## Parameters
 
-* a (`integer`, `float`, `double`, `instruction`) - The number to divide.
-* b (`integer`, `float`, `double`, `instruction`) - The number to divide by.
+* a (`integer`, `float`, `double`) - The number to divide.
+* b (`integer`, `float`, `double`) - The number to divide by.
 
 ## Return
 
@@ -21,7 +21,7 @@ Divide two numbers.
 
 ```json
 {
-  "type": "divide",
+  "type": "div",
   "_": {
     "a": 10,
     "b": 2
@@ -31,5 +31,5 @@ Divide two numbers.
 
 ### Last Updated
 
-Monday, December 26th, 2022.
+Monday, December 30th, 2022.
 Written by [Netkas](https://git.n64.cc/netkas)
