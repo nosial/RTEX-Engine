@@ -94,7 +94,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (%s/%s)',
+                self::getType() . ' %s / %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );

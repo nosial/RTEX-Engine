@@ -80,7 +80,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (%s+%s)',
+                self::getType() . ' %s',
                 Utilities::entityToString($this->Value),
             );
         }
