@@ -4,8 +4,8 @@ Get an item from an array using "dot" notation.
 
 ## Parameters
 
-* array (`array`, `instruction`) - The array to get the value from.
-* key (`string`, `instruction`) - The key to get the value for.
+* array (`array`) - The array to get the value from.
+* key (`string`) - The key to get the value for.
 
 ## Return
 

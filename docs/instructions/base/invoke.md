@@ -4,10 +4,10 @@ Invokes a method under a namespace.
 
 ## Parameters
 
-* namespace (`string`, `instruction`) - The namespace to invoke the method under.
-* method (`string`, `instruction`) - The method to invoke.
-* parameters (`array`, `instruction`) - The parameters to pass to the method.
-* fail_on_error (`boolean`, `instruction`) - Whether to fail if the method throws an exception.
+* namespace (`string`) - The namespace to invoke the method under.
+* method (`string`) - The method to invoke.
+* parameters (`array`) - The parameters to pass to the method.
+* fail_on_error (`boolean`) - Whether to fail if the method throws an exception.
 
 ## Return
 

@@ -4,8 +4,8 @@ Sets aor overwrites a variable in the environment.
 
 ## Parameters
 
-* name (`string`, `instruction`) - The name of the variable to get.
-* value (`any`, `instruction`) - The value to set.
+* name (`string`) - The name of the variable to get.
+* value (`any`) - The value to set.
 
 ## Return
 

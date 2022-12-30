@@ -4,7 +4,7 @@ Gets an existing variable from the environment.
 
 ## Parameters
 
-* name (`string`, `instruction`) - The name of the variable to get.
+* name (`string`) - The name of the variable to get.
 
 ## Return
 
