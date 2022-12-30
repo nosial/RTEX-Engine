@@ -96,11 +96,12 @@
         }
 
         /**
-         * @param mixed $Value
+         * @param mixed $value
+         * @throws InstructionException
          */
-        public function setValue(mixed $Value): void
+        public function setValue(mixed $value): void
         {
-            $this->Value = $Value;
+            $this->Value = InstructionBuilder::fromRaw($value);
         }
 
         /**
