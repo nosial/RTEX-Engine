@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions\Arithmetic;
+    namespace RTEX\Objects\Instructions\Comparators;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -13,19 +13,17 @@
     use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class Round implements InstructionInterface
+    class GreaterThanOrEqual implements InstructionInterface
     {
         /**
          * @var mixed
          */
-        private $Value;
+        private $A;
 
         /**
-         * The number of decimal places to round to
-         *
          * @var mixed
          */
-        private $Precision;
+        private $B;
 
         /**
          * Returns the type of instruction
@@ -34,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::Round;
+            return InstructionType::GreaterThanOrEqual;
         }
 
         /**
@@ -45,7 +43,8 @@
         public function toArray(): array
         {
             return InstructionBuilder::toRaw(self::getType(), [
-                'value' => $this->Value,
+                'a' => $this->A,
+                'b' => $this->B
             ]);
         }
 
@@ -59,31 +58,29 @@
         public static function fromArray(array $data): InstructionInterface
         {
             $instruction = new self();
-            $instruction->setValue($data['value'] ?? null);
+            $instruction->setA($data['a'] ?? null);
+            $instruction->setB($data['b'] ?? null);
             return $instruction;
         }
 
         /**
          * @param Engine $engine
-         * @return float|int
+         * @return bool
          * @throws EvaluationException
          * @throws TypeException
          */
-        public function eval(Engine $engine): int|float
+        public function eval(Engine $engine): bool
         {
-            $value = $engine->eval($this->Value);
-            $precision = $engine->eval($this->Precision);
+            /** @noinspection DuplicatedCode */
+            $a = $engine->eval($this->A);
+            $b = $engine->eval($this->B);
 
-            if(!(is_int($value) || is_float($value) || is_double($value)))
-                throw new TypeException(sprintf('Cannot calculate the round value of a non-numeric value, got %s', Utilities::getType($value, true)));
+            if (!(is_int($a) || is_float($a)) || is_double($a))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'A\' of type \'%s\'', Utilities::getType($a, true)));
+            if (!(is_int($b) || is_float($b)) || is_double($b))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'B\' of type \'%s\'', Utilities::getType($b, true)));
 
-            if(is_null($precision))
-                return round($value);
-
-            if(!(is_int($precision) || is_float($precision) || is_double($precision)))
-                throw new TypeException(sprintf('Cannot calculate the round value of a non-numeric precision, got %s', Utilities::getType($precision, true)));
-
-            return round($value, $precision);
+            return ($a >= $b);
         }
 
         /**
@@ -94,49 +91,51 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' %s',
-                Utilities::entityToString($this->Value),
+                self::getType() . ' %s >= %s',
+                Utilities::entityToString($this->A),
+                Utilities::entityToString($this->B)
             );
         }
-
 
         /**
          * Gets the value of A
          *
          * @return mixed
          */
-        public function getValue(): mixed
+        public function getA(): mixed
         {
-            return $this->Value;
+            return $this->A;
         }
 
         /**
          * Sets the value of A
          *
-         * @param mixed $Value
+         * @param mixed $A
          * @throws InstructionException
          */
-        public function setValue(mixed $Value): void
+        public function setA(mixed $A): void
         {
-            $this->Value = InstructionBuilder::fromRaw($Value);
+            $this->A = InstructionBuilder::fromRaw($A);
         }
 
         /**
+         * Gets the value of B
+         *
          * @return mixed
-         * @noinspection PhpUnused
          */
-        public function getPrecision(): mixed
+        public function getB(): mixed
         {
-            return $this->Precision;
+            return $this->B;
         }
 
         /**
-         * @param mixed $Precision
-         * @noinspection PhpUnused
+         * Sets the value of B
+         *
+         * @param mixed $B
+         * @throws InstructionException
          */
-        public function setPrecision(mixed $Precision): void
+        public function setB(mixed $B): void
         {
-            $this->Precision = $Precision;
+            $this->B = InstructionBuilder::fromRaw($B);
         }
-
     }

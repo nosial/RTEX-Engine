@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions\Comparators;
+    namespace RTEX\Objects\Instructions\Comparators;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -10,9 +10,10 @@
     use RTEX\Engine;
     use RTEX\Exceptions\EvaluationException;
     use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class Equals implements InstructionInterface
+    class LessThanOrEqual implements InstructionInterface
     {
         /**
          * @var mixed
@@ -31,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::Equals;
+            return InstructionType::LessThanOrEqual;
         }
 
         /**
@@ -66,13 +67,20 @@
          * @param Engine $engine
          * @return bool
          * @throws EvaluationException
+         * @throws TypeException
          */
         public function eval(Engine $engine): bool
         {
+            /** @noinspection DuplicatedCode */
             $a = $engine->eval($this->A);
             $b = $engine->eval($this->B);
 
-            return ($a === $b);
+            if (!(is_int($a) || is_float($a)) || is_double($a))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'A\' of type \'%s\'', Utilities::getType($a, true)));
+            if (!(is_int($b) || is_float($b)) || is_double($b))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'B\' of type \'%s\'', Utilities::getType($b, true)));
+
+            return ($a <= $b);
         }
 
         /**
@@ -83,7 +91,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' %s == %s',
+                self::getType() . ' %s <= %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );

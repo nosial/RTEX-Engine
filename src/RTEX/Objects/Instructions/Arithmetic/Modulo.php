@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions\Arithmetic;
+    namespace RTEX\Objects\Instructions\Arithmetic;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -11,10 +11,9 @@
     use RTEX\Exceptions\EvaluationException;
     use RTEX\Exceptions\InstructionException;
     use RTEX\Exceptions\Runtime\TypeException;
-    use RTEX\Exceptions\Runtime\ZeroDivisionException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class Divide implements InstructionInterface
+    class Modulo implements InstructionInterface
     {
         /**
          * @var mixed
@@ -33,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::Divide;
+            return InstructionType::Modulo;
         }
 
         /**
@@ -69,7 +68,6 @@
          * @return int|float
          * @throws EvaluationException
          * @throws TypeException
-         * @throws ZeroDivisionException
          */
         public function eval(Engine $engine): int|float
         {
@@ -77,13 +75,11 @@
             $b = $engine->eval($this->B);
 
             if(!(is_int($a) || is_float($a) || is_double($a)))
-                throw new TypeException(sprintf('Cannot divide a non-numeric value \'A\' of type %s', Utilities::getType($a, true)));
+                throw new TypeException(sprintf('Cannot perform modulo operation on non-numeric value \'A\' of type %s', Utilities::getType($a, true)));
             if(!(is_int($b) || is_float($b) || is_double($b)))
-                throw new TypeException(sprintf('Cannot divide a non-numeric value \'B\' of type %s', Utilities::getType($b, true)));
-            if ($b === 0)
-                throw new ZeroDivisionException(sprintf('Division by zero in %s', $this));
+                throw new TypeException(sprintf('Cannot perform modulo operation on non-numeric value \'B\' of type %s', Utilities::getType($b. true)));
 
-            return (intval($a) / intval($b));
+            return ($a % $b);
         }
 
         /**
@@ -94,7 +90,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' %s / %s',
+                self::getType() . ' %s %% %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );

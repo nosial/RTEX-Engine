@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions\Arithmetic;
+    namespace RTEX\Objects\Instructions\Arithmetic;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -13,12 +13,17 @@
     use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class SquareRoot implements InstructionInterface
+    class Subtract implements InstructionInterface
     {
         /**
          * @var mixed
          */
-        private $Value;
+        private $A;
+
+        /**
+         * @var mixed
+         */
+        private $B;
 
         /**
          * Returns the type of instruction
@@ -27,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::SquareRoot;
+            return InstructionType::Subtract;
         }
 
         /**
@@ -38,7 +43,8 @@
         public function toArray(): array
         {
             return InstructionBuilder::toRaw(self::getType(), [
-                'value' => $this->Value,
+                'a' => $this->A,
+                'b' => $this->B
             ]);
         }
 
@@ -52,7 +58,8 @@
         public static function fromArray(array $data): InstructionInterface
         {
             $instruction = new self();
-            $instruction->setValue($data['value'] ?? null);
+            $instruction->setA($data['a'] ?? null);
+            $instruction->setB($data['b'] ?? null);
             return $instruction;
         }
 
@@ -64,12 +71,15 @@
          */
         public function eval(Engine $engine): int|float
         {
-            $value = $engine->eval($this->Value);
+            $a = $engine->eval($this->A);
+            $b = $engine->eval($this->B);
 
-            if(!(is_int($value) || is_float($value) || is_double($value)))
-                throw new TypeException(sprintf('Cannot calculate the square root of a non-numeric \'Value\', got type %s', Utilities::getType($value, true)));
+            if(!(is_int($a) || is_float($a) || is_double($a)))
+                throw new TypeException(sprintf('Cannot subtract a non-numeric value of \'A\' of type \'%s\'', Utilities::getType($a, true)));
+            if(!(is_int($b) || is_float($b) || is_double($b)))
+                throw new TypeException(sprintf('Cannot subtract a non-numeric value of \'B\' of type \'%s\'', Utilities::getType($b, true)));
 
-            return sqrt($value);
+            return ($a - $b);
         }
 
         /**
@@ -80,8 +90,9 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' %s',
-                Utilities::entityToString($this->Value),
+                self::getType() . ' %s - %s',
+                Utilities::entityToString($this->A),
+                Utilities::entityToString($this->B)
             );
         }
 
@@ -90,20 +101,40 @@
          *
          * @return mixed
          */
-        public function getValue(): mixed
+        public function getA(): mixed
         {
-            return $this->Value;
+            return $this->A;
         }
 
         /**
          * Sets the value of A
          *
-         * @param mixed $Value
+         * @param mixed $A
          * @throws InstructionException
          */
-        public function setValue(mixed $Value): void
+        public function setA(mixed $A): void
         {
-            $this->Value = InstructionBuilder::fromRaw($Value);
+            $this->A = InstructionBuilder::fromRaw($A);
         }
 
+        /**
+         * Gets the value of B
+         *
+         * @return mixed
+         */
+        public function getB(): mixed
+        {
+            return $this->B;
+        }
+
+        /**
+         * Sets the value of B
+         *
+         * @param mixed $B
+         * @throws InstructionException
+         */
+        public function setB(mixed $B): void
+        {
+            $this->B = InstructionBuilder::fromRaw($B);
+        }
     }

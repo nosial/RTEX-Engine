@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions\Arithmetic;
+    namespace RTEX\Objects\Instructions\Comparators;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -13,7 +13,7 @@
     use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class Multiply implements InstructionInterface
+    class LessThan implements InstructionInterface
     {
         /**
          * @var mixed
@@ -32,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::Multiply;
+            return InstructionType::LessThan;
         }
 
         /**
@@ -65,21 +65,22 @@
 
         /**
          * @param Engine $engine
-         * @return int|float
+         * @return bool
          * @throws EvaluationException
          * @throws TypeException
          */
-        public function eval(Engine $engine): int|float
+        public function eval(Engine $engine): bool
         {
+            /** @noinspection DuplicatedCode */
             $a = $engine->eval($this->A);
             $b = $engine->eval($this->B);
 
-            if(!(is_int($a) || is_float($a) || is_double($a)))
-                throw new TypeException(sprintf('Cannot multiply a non-numeric value \'A\' of type \'%s\'', Utilities::getType($a, true)));
-            if(!(is_int($b) || is_float($b) || is_double($b)))
-                throw new TypeException(sprintf('Cannot multiply a non-numeric value \'B\' of type \'%s\'', Utilities::getType($b, true)));
+            if (!(is_int($a) || is_float($a)) || is_double($a))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'A\' of type \'%s\'', Utilities::getType($a, true)));
+            if (!(is_int($b) || is_float($b)) || is_double($b))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'B\' of type \'%s\'', Utilities::getType($b, true)));
 
-            return ($a * $b);
+            return ($a < $b);
         }
 
         /**
@@ -90,7 +91,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' %s * %s',
+                self::getType() . ' %s < %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );

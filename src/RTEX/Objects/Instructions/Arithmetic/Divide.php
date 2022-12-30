@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions\Comparators;
+    namespace RTEX\Objects\Instructions\Arithmetic;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -10,9 +10,11 @@
     use RTEX\Engine;
     use RTEX\Exceptions\EvaluationException;
     use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\TypeException;
+    use RTEX\Exceptions\Runtime\ZeroDivisionException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class NotEquals implements InstructionInterface
+    class Divide implements InstructionInterface
     {
         /**
          * @var mixed
@@ -31,7 +33,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::NotEquals;
+            return InstructionType::Divide;
         }
 
         /**
@@ -64,15 +66,24 @@
 
         /**
          * @param Engine $engine
-         * @return bool
+         * @return int|float
          * @throws EvaluationException
+         * @throws TypeException
+         * @throws ZeroDivisionException
          */
-        public function eval(Engine $engine): bool
+        public function eval(Engine $engine): int|float
         {
             $a = $engine->eval($this->A);
             $b = $engine->eval($this->B);
 
-            return ($a !== $b);
+            if(!(is_int($a) || is_float($a) || is_double($a)))
+                throw new TypeException(sprintf('Cannot divide a non-numeric value \'A\' of type %s', Utilities::getType($a, true)));
+            if(!(is_int($b) || is_float($b) || is_double($b)))
+                throw new TypeException(sprintf('Cannot divide a non-numeric value \'B\' of type %s', Utilities::getType($b, true)));
+            if ($b === 0)
+                throw new ZeroDivisionException(sprintf('Division by zero in %s', $this));
+
+            return (intval($a) / intval($b));
         }
 
         /**
@@ -83,7 +94,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' %s !== %s',
+                self::getType() . ' %s / %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );
