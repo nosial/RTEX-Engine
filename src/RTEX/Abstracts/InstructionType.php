@@ -4,50 +4,57 @@
 
     abstract class InstructionType
     {
+        // Arithmetic
+        const Sum = 'sum';
+        const Subtract = 'sub';
+        const Divide = 'div';
+        const Multiply = 'mul';
+        const Modulo = 'mod';
+        const Power = 'pow';
+        const SquareRoot = 'sqrt';
+        const Absolute = 'abs';
+        const Round = 'round';
+        const Floor = 'floor';
+
         // Base
         const Invoke = 'invoke';
-
-        // Variables
+        const ArrayGet = 'array_get';
+        const ArraySet = 'array_set';
         const GetVariable = 'get';
         const SetVariable = 'set';
 
-        // Math
-        const Equals = 'equals';
-        const Sum = 'sum';
-        const Subtract = 'subtract';
-        const Divide = 'divide';
-        const Multiply = 'multiply';
-        const Modulo = 'modulo';
-        const Power = 'power';
-        const GreaterThan = 'greater_than';
-        const GreaterThanOrEquals = 'greater_than_or_equals';
-        const LessThan = 'less_than';
-        const LessThanOrEquals = 'less_than_or_equals';
-        const NotEquals = 'not_equals';
-
-        // Arrays
-        const ArrayGet = 'array_get';
+        // Comparators
+        const Equals = 'eq';
+        const NotEquals = 'neq';
+        const GreaterThan = 'gt';
+        const GreaterThanOrEquals = 'gte';
+        const LessThan = 'lt';
+        const LessThanOrEquals = 'lte';
 
 
         const All = [
-            self::Invoke,
-
-            self::GetVariable,
-            self::SetVariable,
-
-            self::Equals,
             self::Sum,
             self::Subtract,
             self::Divide,
             self::Multiply,
             self::Modulo,
             self::Power,
+            self::SquareRoot,
+            self::Absolute,
+            self::Round,
+            self::Floor,
+
+            self::Invoke,
+            self::GetVariable,
+            self::SetVariable,
+            self::ArrayGet,
+            self::ArraySet,
+
+            self::Equals,
             self::GreaterThan,
             self::GreaterThanOrEquals,
             self::LessThan,
             self::LessThanOrEquals,
             self::NotEquals,
-
-            self::ArrayGet,
         ];
     }
