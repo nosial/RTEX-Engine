@@ -13,7 +13,7 @@
     use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class LessThanOrEquals implements InstructionInterface
+    class LessThanOrEqual implements InstructionInterface
     {
         /**
          * @var mixed
@@ -32,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::LessThanOrEquals;
+            return InstructionType::LessThanOrEqual;
         }
 
         /**

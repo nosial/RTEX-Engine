@@ -13,7 +13,7 @@
     use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class GreaterThanOrEquals implements InstructionInterface
+    class GreaterThanOrEqual implements InstructionInterface
     {
         /**
          * @var mixed
@@ -32,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::GreaterThanOrEquals;
+            return InstructionType::GreaterThanOrEqual;
         }
 
         /**
