@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Arithmetic;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -11,20 +11,14 @@
     use RTEX\Exceptions\EvaluationException;
     use RTEX\Exceptions\InstructionException;
     use RTEX\Exceptions\Runtime\TypeException;
-    use RTEX\Exceptions\Runtime\ZeroDivisionException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class Divide implements InstructionInterface
+    class SquareRoot implements InstructionInterface
     {
         /**
          * @var mixed
          */
-        private $A;
-
-        /**
-         * @var mixed
-         */
-        private $B;
+        private $Value;
 
         /**
          * Returns the type of instruction
@@ -33,7 +27,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::Divide;
+            return InstructionType::SquareRoot;
         }
 
         /**
@@ -44,8 +38,7 @@
         public function toArray(): array
         {
             return InstructionBuilder::toRaw(self::getType(), [
-                'a' => $this->A,
-                'b' => $this->B
+                'value' => $this->Value,
             ]);
         }
 
@@ -59,31 +52,24 @@
         public static function fromArray(array $data): InstructionInterface
         {
             $instruction = new self();
-            $instruction->setA($data['a'] ?? null);
-            $instruction->setB($data['b'] ?? null);
+            $instruction->setValue($data['value'] ?? null);
             return $instruction;
         }
 
         /**
          * @param Engine $engine
-         * @return int
+         * @return int|float
          * @throws EvaluationException
          * @throws TypeException
-         * @throws ZeroDivisionException
          */
-        public function eval(Engine $engine): int
+        public function eval(Engine $engine): int|float
         {
-            $a = $engine->eval($this->A);
-            $b = $engine->eval($this->B);
+            $value = $engine->eval($this->Value);
 
-            if(!(is_int($a) || is_float($a) || is_double($a)))
-                throw new TypeException('Cannot divide a non-numeric value');
-            if(!(is_int($b) || is_float($b) || is_double($b)))
-                throw new TypeException('Cannot divide by a non-numeric value');
-            if ($b === 0)
-                throw new ZeroDivisionException(sprintf('Division by zero in %s', $this));
+            if(!(is_int($value) || is_float($value) || is_double($value)))
+                throw new TypeException(sprintf('Cannot calculate the square root of a non-numeric \'Value\', got type %s', Utilities::getType($value, true)));
 
-            return (intval($a) / intval($b));
+            return sqrt($value);
         }
 
         /**
@@ -94,9 +80,8 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (%s/%s)',
-                Utilities::entityToString($this->A),
-                Utilities::entityToString($this->B)
+                self::getType() . ' (%s+%s)',
+                Utilities::entityToString($this->Value),
             );
         }
 
@@ -105,40 +90,20 @@
          *
          * @return mixed
          */
-        public function getA(): mixed
+        public function getValue(): mixed
         {
-            return $this->A;
+            return $this->Value;
         }
 
         /**
          * Sets the value of A
          *
-         * @param mixed $A
+         * @param mixed $Value
          * @throws InstructionException
          */
-        public function setA(mixed $A): void
+        public function setValue(mixed $Value): void
         {
-            $this->A = InstructionBuilder::fromRaw($A);
+            $this->Value = InstructionBuilder::fromRaw($Value);
         }
 
-        /**
-         * Gets the value of B
-         *
-         * @return mixed
-         */
-        public function getB(): mixed
-        {
-            return $this->B;
-        }
-
-        /**
-         * Sets the value of B
-         *
-         * @param mixed $B
-         * @throws InstructionException
-         */
-        public function setB(mixed $B): void
-        {
-            $this->B = InstructionBuilder::fromRaw($B);
-        }
     }
