@@ -20,6 +20,8 @@
 
         const Instruction = 'instruction';
 
+        const Unknown = 'unknown';
+
         const All = [
             self::String,
             self::Integer,
