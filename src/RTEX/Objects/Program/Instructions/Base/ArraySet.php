@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Base;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Abstracts\RegexPatterns;
@@ -16,7 +16,7 @@
     use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class ArrayGet implements InstructionInterface
+    class ArraySet implements InstructionInterface
     {
         /**
          * The array to read from
@@ -30,6 +30,13 @@
          *
          * @var mixed
          */
+        private $Key;
+
+        /**
+         * The value to set the key's value to
+         *
+         * @var mixed
+         */
         private $Value;
 
         /**
@@ -39,7 +46,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::ArrayGet;
+            return InstructionType::ArraySet;
         }
 
         /**
@@ -63,10 +70,11 @@
 
         /**
          * @return mixed
+         * @noinspection PhpUnused
          */
-        public function getValue(): mixed
+        public function getKey(): mixed
         {
-            return $this->Value;
+            return $this->Key;
         }
 
         /**
@@ -74,9 +82,25 @@
          * @throws InstructionException
          * @noinspection PhpMissingParamTypeInspection
          */
-        public function setValue($value): void
+        public function setKey($value): void
         {
-            $this->Value = InstructionBuilder::fromRaw($value);
+            $this->Key = InstructionBuilder::fromRaw($value);
+        }
+
+        /**
+         * @return mixed
+         */
+        public function getValue(): mixed
+        {
+            return $this->Value;
+        }
+
+        /**
+         * @param mixed $Value
+         */
+        public function setValue(mixed $Value): void
+        {
+            $this->Value = $Value;
         }
 
         /**
@@ -88,6 +112,7 @@
         {
             return InstructionBuilder::toRaw(self::getType(), [
                 'array' => $this->Array,
+                'key' => $this->Key,
                 'value' => $this->Value
             ]);
         }
@@ -101,6 +126,7 @@
         {
             $instruction = new self();
             $instruction->setArray($data['array'] ?? null);
+            $instruction->setKey($data['key'] ?? null);
             $instruction->setValue($data['value'] ?? null);
 
             return $instruction;
@@ -108,39 +134,39 @@
 
         /**
          * @param Engine $engine
-         * @return mixed
+         * @return array
          * @throws EvaluationException
          * @throws KeyException
          * @throws TypeException
+         * @noinspection DuplicatedCode
          */
-        public function eval(Engine $engine): mixed
+        public function eval(Engine $engine): array
         {
-            $value = $engine->eval($this->Value);
+            $key = $engine->eval($this->Key);
             $array = $engine->eval($this->Array);
+            $value = $engine->eval($this->Value);
 
             if (!is_array($array))
                 throw new KeyException(sprintf('Cannot read from non-array value of type %s', Utilities::getType($array, true)));
-            if(!is_string($value) && !is_int($value))
-                throw new TypeException(sprintf('Cannot read from array with non-string value %s', Utilities::getType($value, true)));
-            if(!Validate::validateRegex($value, RegexPatterns::ArrayQuery))
-                throw new KeyException(sprintf('Cannot read from array with invalid query %s', $value));
+            if(!is_string($key) && !is_int($key))
+                throw new TypeException(sprintf('Cannot read from array with non-string value %s', Utilities::getType($key, true)));
+            if(!Validate::validateRegex($key, RegexPatterns::ArrayQuery))
+                throw new KeyException(sprintf('Cannot read from array with invalid query %s', $key));
 
-            $keys = explode('.', $value);
-            $result = $array;
+            $keys = explode('.', $key);
+            $result = &$array; // use a reference so we can modify the original array
             foreach ($keys as $key)
             {
-                if (is_array($result) && array_key_exists($key, $result))
-                {
-                    $result = $result[$key];
-                }
-                else
-                {
+                if (!(is_array($result) && array_key_exists($key, $result)))
                     throw new KeyException(sprintf('Key "%s" does not exist in array (%s)', $key, $value));
-                }
+
+                $result = &$result[$key];
             }
 
-            return $result;
+            $result = $value;
+            return $array;
         }
+
 
         /**
          * @inheritDoc
@@ -148,8 +174,9 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (array: %s, value: %s)',
+                self::getType() . ' %s[%s]=%s',
                 Utilities::entityToString($this->Array),
+                Utilities::entityToString($this->Key),
                 Utilities::entityToString($this->Value)
             );
         }

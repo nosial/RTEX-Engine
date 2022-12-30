@@ -2,14 +2,16 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Base;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
     use RTEX\Classes\Utilities;
     use RTEX\Engine;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\EvaluationException;
+    use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\ImportException;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
     class Invoke implements InstructionInterface
@@ -60,7 +62,6 @@
 
         /**
          * @return array
-         * @throws UnsupportedVariableType
          */
         public function toArray(): array
         {
@@ -68,7 +69,7 @@
                 'namespace' => $this->Namespace,
                 'method' => $this->Method,
                 'parameters' => $this->Parameters,
-                'fail_on_error' => $this->FailOnError,
+                'fail_on_error' => $this->FailOnError, // TODO: Implement this
             ]);
         }
 
@@ -77,8 +78,7 @@
          *
          * @param array $data
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public static function fromArray(array $data): InstructionInterface
         {
@@ -96,19 +96,24 @@
          *
          * @param Engine $engine
          * @return mixed
-         * @throws UnsupportedVariableType
-         * @noinspection PhpMissingReturnTypeInspection
+         * @throws EvaluationException
+         * @throws ImportException
+         * @throws TypeException
          */
-        public function eval(Engine $engine)
+        public function eval(Engine $engine): mixed
         {
+            $namespace = $engine->eval($this->Namespace);
+            $method = $engine->eval($this->Method);
             $parameters = [];
             foreach($this->Parameters as $key => $value)
                 $parameters[$key] = $engine->eval($value);
 
-            return $engine->callMethod(
-                $engine->eval($this->Namespace), $engine->eval($this->Method),
-                $parameters
-            );
+            if(!is_string($namespace))
+                throw new TypeException(sprintf('The namespace must be a string, %s given', Utilities::getType($namespace, true)));
+            if(!is_string($method))
+                throw new TypeException(sprintf('The method must be a string, %s given', Utilities::getType($method, true)));
+
+            return $engine->callMethod($namespace, $method, $parameters);
         }
 
         /**
@@ -156,8 +161,7 @@
 
         /**
          * @param array $Parameters
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public function setParameters(array $Parameters): void
         {
@@ -183,7 +187,6 @@
 
         /**
          * @inheritDoc
-         * @throws UnsupportedVariableType
          */
         public function __toString(): string
         {

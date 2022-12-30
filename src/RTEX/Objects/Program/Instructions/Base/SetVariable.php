@@ -2,14 +2,15 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Base;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
     use RTEX\Classes\Utilities;
     use RTEX\Engine;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\EvaluationException;
+    use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
     class SetVariable implements InstructionInterface
@@ -19,7 +20,7 @@
          *
          * @var mixed
          */
-        private $Variable;
+        private $Name;
 
         /**
          * The value to set the variable to
@@ -38,41 +39,38 @@
             return InstructionType::SetVariable;
         }
 
-
         /**
          * @return mixed
-         * @noinspection PhpMissingReturnTypeInspection
+         
          * @noinspection PhpUnused
          */
-        public function getVariable()
+        public function getName(): mixed
         {
-            return $this->Variable;
+            return $this->Name;
         }
 
         /**
          * @param mixed $variable
-         * @throws UnsupportedVariableType
-         * @throws MalformedInstructionException
+         * @throws InstructionException
          * @noinspection PhpMissingParamTypeInspection
          */
-        public function setVariable($variable): void
+        public function setName($variable): void
         {
-            $this->Variable = InstructionBuilder::fromRaw($variable);
+            $this->Name = InstructionBuilder::fromRaw($variable);
         }
 
         /**
          * @return mixed
-         * @noinspection PhpMissingReturnTypeInspection
+         
          */
-        public function getValue()
+        public function getValue(): mixed
         {
             return $this->Value;
         }
 
         /**
          * @param mixed $value
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          * @noinspection PhpMissingParamTypeInspection
          */
         public function setValue($value): void
@@ -84,12 +82,11 @@
          * Returns an array representation of the object
          *
          * @return array
-         * @throws UnsupportedVariableType
          */
         public function toArray(): array
         {
             return InstructionBuilder::toRaw(self::getType(), [
-                'variable' => $this->Variable,
+                'name' => $this->Name,
                 'value' => $this->Value
             ]);
         }
@@ -97,13 +94,12 @@
         /**
          * @param array $data
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public static function fromArray(array $data): InstructionInterface
         {
             $instruction = new self();
-            $instruction->setVariable($data['variable'] ?? null);
+            $instruction->setName($data['name'] ?? null);
             $instruction->setValue($data['value'] ?? null);
 
             return $instruction;
@@ -112,25 +108,28 @@
         /**
          * @param Engine $engine
          * @return void
-         * @throws UnsupportedVariableType
+         * @throws EvaluationException
+         * @throws TypeException
          */
         public function eval(Engine $engine): void
         {
-            $engine->getEnvironment()->setRuntimeVariable(
-                $engine->eval($this->Variable),
-                $engine->eval($this->Value)
-            );
+            $name = $engine->eval($this->Name);
+            $value = $engine->eval($this->Value);
+
+            if(!is_string($name))
+                throw new TypeException(sprintf('Variable name must be a string, %s given', Utilities::getType($name, true)));
+
+            $engine->getEnvironment()->setRuntimeVariable($name, $value);
         }
 
         /**
          * @inheritDoc
-         * @throws UnsupportedVariableType
          */
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (variable: %s, value: %s)',
-                Utilities::entityToString($this->Variable),
+                self::getType() . ' %s VALUE %s',
+                Utilities::entityToString($this->Name),
                 Utilities::entityToString($this->Value)
             );
         }

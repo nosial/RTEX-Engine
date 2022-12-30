@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Base;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -67,14 +67,9 @@
             $variable = $engine->eval($this->VariableName);
 
             if(!is_string($variable))
-                throw new TypeException(sprintf('Expected string, got %s', Utilities::getType($variable)));
-
-            if (!$engine->getEnvironment()->variableExists($variable))
-                throw new NameException("Variable '$variable' is not defined");
+                throw new TypeException(sprintf('Expected string, got %s', Utilities::getType($variable, true)));
             
-            return $engine->getEnvironment()->getRuntimeVariable(
-                $engine->eval($this->VariableName)
-            );
+            return $engine->getEnvironment()->getRuntimeVariable($variable);
         }
 
         /**
@@ -110,7 +105,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (name: %s)',
+                self::getType() . ' %s',
                 Utilities::entityToString($this->VariableName)
             );
         }
