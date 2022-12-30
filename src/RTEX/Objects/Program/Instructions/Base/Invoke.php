@@ -17,18 +17,11 @@
     class Invoke implements InstructionInterface
     {
         /**
-         * The namespace of the method to invoke
+         * The name of the namespace & method to invoke
          *
          * @var string
          */
-        private $Namespace;
-
-        /**
-         * The name of the method to invoke
-         *
-         * @var string
-         */
-        private $Method;
+        private $Callable;
 
         /**
          * The parameters to pass to the method
@@ -66,10 +59,9 @@
         public function toArray(): array
         {
             return InstructionBuilder::toRaw(self::getType(), [
-                'namespace' => $this->Namespace,
-                'method' => $this->Method,
+                'callable' => $this->Callable,
                 'parameters' => $this->Parameters,
-                'fail_on_error' => $this->FailOnError, // TODO: Implement this
+                'fail_on_error' => $this->FailOnError
             ]);
         }
 
@@ -83,8 +75,7 @@
         public static function fromArray(array $data): InstructionInterface
         {
             $instruction = new self();
-            $instruction->setNamespace($data['namespace'] ?? null);
-            $instruction->setMethod($data['method'] ?? null);
+            $instruction->setCallable($data['callable'] ?? null);
             $instruction->setParameters($data['parameters'] ?? []);
             $instruction->setFailOnError($data['fail_on_error'] ?? false);
 
@@ -102,16 +93,20 @@
          */
         public function eval(Engine $engine): mixed
         {
-            $namespace = $engine->eval($this->Namespace);
-            $method = $engine->eval($this->Method);
+            $callable = $engine->eval($this->Callable);
             $parameters = [];
             foreach($this->Parameters as $key => $value)
                 $parameters[$key] = $engine->eval($value);
 
-            if(!is_string($namespace))
-                throw new TypeException(sprintf('The namespace must be a string, %s given', Utilities::getType($namespace, true)));
-            if(!is_string($method))
-                throw new TypeException(sprintf('The method must be a string, %s given', Utilities::getType($method, true)));
+            if(!is_string($callable))
+                throw new TypeException(sprintf('Callable must be a string, %s given', Utilities::getType($callable, true)));
+
+            $callable = explode('.', $callable);
+            if(count($callable) !== 2)
+                throw new ImportException(sprintf('Callable must be in the format of "namespace.method", %s given', $this->Callable));
+
+            $namespace = $callable[0];
+            $method = $callable[1];
 
             return $engine->callMethod($namespace, $method, $parameters);
         }
@@ -120,34 +115,17 @@
          * @return string
          * @noinspection PhpUnused
          */
-        public function getNamespace(): string
+        public function getCallable(): string
         {
-            return $this->Namespace;
+            return $this->Callable;
         }
 
         /**
-         * @param string $Namespace
+         * @param string $Callable
          */
-        public function setNamespace(string $Namespace): void
+        public function setCallable(string $Callable): void
         {
-            $this->Namespace = $Namespace;
-        }
-
-        /**
-         * @return string
-         * @noinspection PhpUnused
-         */
-        public function getMethod(): string
-        {
-            return $this->Method;
-        }
-
-        /**
-         * @param string $Method
-         */
-        public function setMethod(string $Method): void
-        {
-            $this->Method = $Method;
+            $this->Callable = $Callable;
         }
 
         /**
@@ -194,9 +172,21 @@
             foreach ($this->Parameters as $key => $value)
                 $parameters[] = $key . ': ' . Utilities::entityToString($value);
 
+            $callable = explode('.', Utilities::entityToString($this->Callable));
+            if(count($callable) !== 2)
+            {
+                $namespace = 'unknown';
+                $method = 'unknown';
+            }
+            else
+            {
+                $namespace = $callable[0];
+                $method = $callable[1];
+            }
+
             $results = sprintf(
-                self::getType() . ' %s::%s(%s)',
-                $this->Namespace, $this->Method, implode(', ', $parameters)
+                self::getType() . ' %s.%s(%s)',
+                $namespace, $method, implode(', ', $parameters)
             );
 
             if(!$this->FailOnError)

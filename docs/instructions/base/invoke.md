@@ -4,8 +4,7 @@ Invokes a method under a namespace.
 
 ## Parameters
 
-* namespace (`string`) - The namespace to invoke the method under.
-* method (`string`) - The method to invoke.
+* callable (`string`) - The callable to invoke. (e.g. `namespace.method`, `system.print`, `time.now`)
 * parameters (`array`) - The parameters to pass to the method.
 * fail_on_error (`boolean`) - Whether to fail if the method throws an exception.
 
@@ -26,8 +25,7 @@ Invokes a method under a namespace.
 {
   "type": "invoke",
   "_": {
-    "namespace": "system",
-    "method": "print",
+    "callable": "system.print",
     "parameters": {
       "value": "Hello, world!"
     },
@@ -38,5 +36,5 @@ Invokes a method under a namespace.
 
 ### Last Updated
 
-Monday, December 29th, 2022.
+Monday, December 30th, 2022.
 Written by [Netkas](https://git.n64.cc/netkas)
