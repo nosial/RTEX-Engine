@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Comparators;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -83,7 +83,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (%s==%s)',
+                self::getType() . ' %s == %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );

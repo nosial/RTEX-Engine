@@ -2,17 +2,18 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Comparators;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
     use RTEX\Classes\Utilities;
     use RTEX\Engine;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\EvaluationException;
+    use RTEX\Exceptions\InstructionException;
+    use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class LessThan implements InstructionInterface
+    class GreaterThanOrEquals implements InstructionInterface
     {
         /**
          * @var mixed
@@ -31,14 +32,13 @@
          */
         public function getType(): string
         {
-            return InstructionType::LessThan;
+            return InstructionType::GreaterThanOrEquals;
         }
 
         /**
          * Returns an array representation of the instruction
          *
          * @return array
-         * @throws UnsupportedVariableType
          */
         public function toArray(): array
         {
@@ -53,8 +53,7 @@
          *
          * @param array $data
          * @return InstructionInterface
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public static function fromArray(array $data): InstructionInterface
         {
@@ -66,24 +65,33 @@
 
         /**
          * @param Engine $engine
-         * @return int
-         * @throws UnsupportedVariableType
+         * @return bool
+         * @throws EvaluationException
+         * @throws TypeException
          */
-        public function eval(Engine $engine): int
+        public function eval(Engine $engine): bool
         {
-            return (intval($engine->eval($this->A)) < intval($engine->eval($this->B)));
+            /** @noinspection DuplicatedCode */
+            $a = $engine->eval($this->A);
+            $b = $engine->eval($this->B);
+
+            if (!(is_int($a) || is_float($a)) || is_double($a))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'A\' of type \'%s\'', Utilities::getType($a, true)));
+            if (!(is_int($b) || is_float($b)) || is_double($b))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'B\' of type \'%s\'', Utilities::getType($b, true)));
+
+            return ($a >= $b);
         }
 
         /**
          * Returns the string representation of the instruction
          *
          * @return string
-         * @throws UnsupportedVariableType
          */
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (%s<%s)',
+                self::getType() . ' %s >= %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );
@@ -103,8 +111,7 @@
          * Sets the value of A
          *
          * @param mixed $A
-         * @throws UnsupportedVariableType
-         * @throws MalformedInstructionException
+         * @throws InstructionException
          */
         public function setA(mixed $A): void
         {
@@ -125,8 +132,7 @@
          * Sets the value of B
          *
          * @param mixed $B
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public function setB(mixed $B): void
         {

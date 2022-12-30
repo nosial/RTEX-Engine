@@ -2,7 +2,7 @@
 
     /** @noinspection PhpMissingFieldTypeInspection */
 
-    namespace RTEX\Objects\Program\Instructions;
+    namespace RTEX\Objects\Program\Instructions\Comparators;
 
     use RTEX\Abstracts\InstructionType;
     use RTEX\Classes\InstructionBuilder;
@@ -13,7 +13,7 @@
     use RTEX\Exceptions\Runtime\TypeException;
     use RTEX\Interfaces\InstructionInterface;
 
-    class GreaterThanOrEquals implements InstructionInterface
+    class GreaterThan implements InstructionInterface
     {
         /**
          * @var mixed
@@ -32,7 +32,7 @@
          */
         public function getType(): string
         {
-            return InstructionType::GreaterThanOrEquals;
+            return InstructionType::GreaterThan;
         }
 
         /**
@@ -65,21 +65,22 @@
 
         /**
          * @param Engine $engine
-         * @return int
-         * @throws TypeException
+         * @return bool
          * @throws EvaluationException
+         * @throws TypeException
          */
-        public function eval(Engine $engine): int
+        public function eval(Engine $engine): bool
         {
+            /** @noinspection DuplicatedCode */
             $a = $engine->eval($this->A);
             $b = $engine->eval($this->B);
 
-            if (!is_numeric($a))
-                throw new TypeException(sprintf('Parameter "a" must be numeric, %s given', Utilities::getType($a)));
-            if (!is_numeric($b))
-                throw new TypeException(sprintf('Parameter "b" must be numeric, %s given', Utilities::getType($b)));
+            if (!(is_int($a) || is_float($a)) || is_double($a))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'A\' of type \'%s\'', Utilities::getType($a, true)));
+            if (!(is_int($b) || is_float($b)) || is_double($b))
+                throw new TypeException(sprintf('Cannot compare a non-numeric value \'B\' of type \'%s\'', Utilities::getType($b, true)));
 
-            return (intval($engine->eval($this->A)) >= intval($engine->eval($this->B)));
+            return ($a > $b);
         }
 
         /**
@@ -90,7 +91,7 @@
         public function __toString(): string
         {
             return sprintf(
-                self::getType() . ' (%s>=%s)',
+                self::getType() . ' %s > %s',
                 Utilities::entityToString($this->A),
                 Utilities::entityToString($this->B)
             );

@@ -1,11 +1,11 @@
-# greater_than
+# gt
 
 Returns true if the first argument is greater than the second argument.
 
 ## Parameters
 
-* a (`integer`, `float`, `double`, `instruction`) - The first number.
-* b (`integer`, `float`, `double`, `instruction`) - The second number.
+* a (`integer`, `float`, `double`) - The first number.
+* b (`integer`, `float`, `double`) - The second number.
 
 ## Return
 
@@ -20,7 +20,7 @@ Returns true if the first argument is greater than the second argument.
 
 ```json
 {
-  "type": "greater_than",
+  "type": "gt",
   "_": {
     "a": 10,
     "b": 2
@@ -30,5 +30,5 @@ Returns true if the first argument is greater than the second argument.
 
 ### Last Updated
 
-Monday, December 29th, 2022.
+Monday, December 30th, 2022.
 Written by [Netkas](https://git.n64.cc/netkas)

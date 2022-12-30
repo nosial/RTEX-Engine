@@ -1,11 +1,11 @@
-# equals
+# eq
 
 Returns true if the two values are equal, false otherwise.
 
 ## Parameters
 
-* a (`integer`, `float`, `double`, `string`, `boolean`, `instruction`) - The first value to compare.
-* b (`integer`, `float`, `double`, `string`, `boolean`, `instruction`) - The second value to compare.
+* a (`integer`, `float`, `double`, `string`, `boolean`) - The first value to compare.
+* b (`integer`, `float`, `double`, `string`, `boolean`) - The second value to compare.
 
 ## Return
 
@@ -21,7 +21,7 @@ Returns true if the two values are equal, false otherwise.
 
 ```json
 {
-  "type": "equals",
+  "type": "eq",
   "_": {
     "a": "foo",
     "b": "foo"
@@ -31,5 +31,5 @@ Returns true if the two values are equal, false otherwise.
 
 ### Last Updated
 
-Monday, December 29th, 2022.
+Monday, December 30th, 2022.
 Written by [Netkas](https://git.n64.cc/netkas)
