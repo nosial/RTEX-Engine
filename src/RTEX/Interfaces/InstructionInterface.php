@@ -34,7 +34,7 @@
          * Evaluates the instruction and returns the result of the evaluation
          *
          * @param Engine $engine
-         * @return mixed
+         * @return mixed|void
          */
         public function eval(Engine $engine);
 
