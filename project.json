@@ -18,15 +18,27 @@
     },
     "assembly": {
         "name": "Real-Time Execution Engine",
-        "descritpion": "Real-Time Execution Engine",
+        "description": "An engine to execute instructions in real-time",
         "company": "Nosial",
         "package": "net.nosial.rtex",
         "version": "1.0.0",
         "uuid": "306c25c2-825f-11ed-b106-ad30777c00c3"
     },
+    "execution_policies": {
+        "main": {
+            "runner": "php",
+            "exec": {
+                "target": "bin/main",
+                "working_directory": "%CWD%",
+                "silent": false,
+                "tty": true
+            }
+        }
+    },
     "build": {
         "source_path": "src",
         "default_configuration": "release",
+        "main_execution": "main",
         "define_constants": {
             "ASSEMBLY_NAME": "%ASSEMBLY.NAME%",
             "ASSEMBLY_PACKAGE": "%ASSEMBLY.PACKAGE%",
