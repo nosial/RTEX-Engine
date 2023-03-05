@@ -27,9 +27,9 @@
         const Equals = 'eq';
         const NotEquals = 'neq';
         const GreaterThan = 'gt';
-        const GreaterThanOrEquals = 'gte';
+        const GreaterThanOrEqual = 'gte';
         const LessThan = 'lt';
-        const LessThanOrEquals = 'lte';
+        const LessThanOrEqual = 'lte';
 
 
         const All = [
@@ -52,9 +52,9 @@
 
             self::Equals,
             self::GreaterThan,
-            self::GreaterThanOrEquals,
+            self::GreaterThanOrEqual,
             self::LessThan,
-            self::LessThanOrEquals,
+            self::LessThanOrEqual,
             self::NotEquals,
         ];
     }

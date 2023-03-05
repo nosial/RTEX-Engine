@@ -1,10 +1,11 @@
 <?php
 
+    /** @noinspection PhpMissingFieldTypeInspection */
+
     namespace RTEX\Objects\Program;
 
-    use RTEX\Classes\Utilities;
-    use RTEX\Exceptions\Core\MalformedInstructionException;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Classes\InstructionBuilder;
+    use RTEX\Exceptions\InstructionException;
     use RTEX\Interfaces\InstructionInterface;
 
     class Script
@@ -50,6 +51,7 @@
          * Returns the number of instructions in the script
          *
          * @return int
+         * @noinspection PhpUnused
          */
         public function getInstructionCount(): int
         {
@@ -73,6 +75,7 @@
          * @param int $index
          * @param InstructionInterface $instruction
          * @return void
+         * @noinspection PhpUnused
          */
         public function replaceInstruction(int $index, InstructionInterface $instruction): void
         {
@@ -80,11 +83,26 @@
         }
 
         /**
+         * Reorders the instructions in the script
+         *
+         * @param int $index
+         * @param int $newIndex
+         * @return void
+         * @noinspection PhpUnused
+         */
+        public function reorderInstruction(int $index, int $newIndex): void
+        {
+            $instruction = $this->getInstruction($index);
+            $this->deleteInstruction($index);
+            array_splice($this->Instructions, $newIndex, 0, [$instruction]);
+        }
+
+        /**
          * Clears all instructions from the script
          *
          * @return void
          */
-        public function clear()
+        public function clear(): void
         {
             $this->Instructions = [];
         }
@@ -110,15 +128,14 @@
          *
          * @param array $data
          * @return Script
-         * @throws MalformedInstructionException
-         * @throws UnsupportedVariableType
+         * @throws InstructionException
          */
         public static function fromArray(array $data): Script
         {
             $script = new Script();
 
             foreach ($data as $instruction)
-                $script->addInstruction(Utilities::constructInstruction($instruction));
+                $script->addInstruction(InstructionBuilder::fromRaw($instruction));
 
             return $script;
         }
@@ -129,5 +146,19 @@
         public function getInstructions(): array
         {
             return $this->Instructions;
+        }
+
+        /**
+         * Returns a string representation of the script (for debugging)
+         *
+         * @return string
+         */
+        public function __toString(): string
+        {
+            $results = [];
+            foreach ($this->Instructions as $instruction)
+                $results[] = $instruction->__toString();
+
+            return implode("\n", $results);
         }
     }

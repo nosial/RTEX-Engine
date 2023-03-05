@@ -1,8 +1,11 @@
 <?php
 
-    namespace RTEX\Objects;
+    /** @noinspection PhpMissingFieldTypeInspection */
+
+    namespace RTEX\Objects\Engine;
 
     use LogLib\Log;
+    use RTEX\Exceptions\Runtime\NameException;
 
     class Environment
     {
@@ -24,10 +27,15 @@
          *
          * @param string $name
          * @return mixed
+         * @throws NameException
          */
-        public function getRuntimeVariable(string $name)
+        public function getRuntimeVariable(string $name): mixed
         {
             Log::debug('net.nosial.rtex', $name);
+
+            if (!$this->variableExists($name))
+                throw new NameException("Variable '$name' is not defined");
+
             return $this->RuntimeVariables[$name];
         }
 
@@ -37,20 +45,40 @@
          * @param string $name
          * @param mixed $value
          */
-        public function setRuntimeVariable(string $name, $value): void
+        public function setRuntimeVariable(string $name, mixed $value): void
         {
             Log::debug('net.nosial.rtex', $name);
             $this->RuntimeVariables[$name] = $value;
         }
 
         /**
+         * @param string $name
+         * @return bool
+         */
+        public function variableExists(string $name): bool
+        {
+            return array_key_exists($name, $this->RuntimeVariables);
+        }
+
+        /**
          * Clears the value of the specified variable
          *
          * @return void
+         * @noinspection PhpUnused
          */
         public function clearRuntimeVariables(): void
         {
             $this->RuntimeVariables = [];
+        }
+
+        /**
+         * Counts the number of variables in the environment
+         *
+         * @return int
+         */
+        public function countRuntimeVariables(): int
+        {
+            return count($this->RuntimeVariables);
         }
 
         /**

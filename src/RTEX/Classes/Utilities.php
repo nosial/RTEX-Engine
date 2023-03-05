@@ -12,10 +12,11 @@
          * Determines the type of variable, throws an exception if the type is not supported
          *
          * @param $input
+         * @param bool $return_unknown
          * @return string
          * @throws TypeException
          */
-        public static function getType($input): string
+        public static function getType($input, bool $return_unknown=false): string
         {
             if ($input instanceof InstructionInterface)
                 return VariableType::Instruction;
@@ -33,6 +34,8 @@
                 return VariableType::Array;
             if (is_null($input))
                 return VariableType::Null;
+            if ($return_unknown)
+                return VariableType::Unknown;
 
             throw new TypeException(gettype($input));
         }
@@ -43,9 +46,8 @@
          *
          * @param $input
          * @return array|mixed
-         * @noinspection PhpMissingReturnTypeInspection
          */
-        public static function toArray($input)
+        public static function toArray($input): mixed
         {
             if($input instanceof InstructionInterface)
                 return $input->toArray();

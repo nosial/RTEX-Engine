@@ -1,13 +1,14 @@
 <?php
 
+    /** @noinspection PhpMissingFieldTypeInspection */
+
     namespace RTEX;
 
+    use Exception;
     use LogLib\Log;
-    use RTEX\Abstracts\VariableTypes;
-    use RTEX\Classes\Utilities;
-    use RTEX\Exceptions\Core\UnsupportedVariableType;
+    use RTEX\Exceptions\EvaluationException;
     use RTEX\Interfaces\InstructionInterface;
-    use RTEX\Objects\Environment;
+    use RTEX\Objects\Engine\Environment;
     use RTEX\Objects\Program;
 
     class Engine
@@ -32,9 +33,9 @@
          * Executes the program by running the main script of the program
          *
          * @return void
-         * @throws UnsupportedVariableType
+         * @throws EvaluationException
          */
-        public function run()
+        public function run(): void
         {
             foreach($this->Program->getMain()->getInstructions() as $instruction)
             {
@@ -47,20 +48,24 @@
          *
          * @param $input
          * @return mixed
-         * @throws UnsupportedVariableType
-         * @noinspection PhpMissingReturnTypeInspection
+         * @throws EvaluationException
          */
-        public function eval($input)
+        public function eval($input): mixed
         {
-            switch(Utilities::determineType($input))
+            try
             {
-                case VariableTypes::Instruction:
-                    /** @var InstructionInterface $input */
+                if($input instanceof InstructionInterface)
+                {
+                    Log::debug('net.nosial.rtex', $input);
                     return $input->eval($this);
-
-                default:
-                    return $input;
+                }
             }
+            catch(Exception $e)
+            {
+                throw new EvaluationException($e->getMessage(), $e->getCode(), $e);
+            }
+
+            return $input;
         }
 
         /**
@@ -85,5 +90,19 @@
         public function getEnvironment(): Environment
         {
             return $this->Environment;
+        }
+
+        /**
+         * Calls the method
+         *
+         * @param string $namespace
+         * @param string $method
+         * @param array $arguments
+         * @return mixed
+         */
+        public function callMethod(string $namespace, string $method, array $arguments)
+        {
+            // TODO: Implement callMethod() method.
+            return null;
         }
     }

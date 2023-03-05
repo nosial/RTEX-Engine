@@ -15,6 +15,8 @@
       <path value="/etc/ncc" />
       <path value="/var/ncc/packages/net.nosial.optslib=1.0.1" />
       <path value="/var/ncc/packages/net.nosial.loglib=1.0.0" />
+      <path value="/var/ncc/packages/net.nosial.rtex_filesystem=1.0.0" />
+      <path value="/var/ncc/packages/com.cheprasov.php_redis_client=1.10.0" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />

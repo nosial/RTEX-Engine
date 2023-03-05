@@ -1,0 +1,81 @@
+# Runtime configuration for RTEX, this section defines the configuration
+# values used for the engine. Allowing you to set a maximum number of
+# resources a program may use, or disable certain instructions.
+# you can also import other NCC packages designed to extend RTEX
+# such as the 'com.nosia.rtex_filesystem' package which adds IO functionality to RTEX.
+runtime:
+    # The maximum value size in bytes, this is the maximum size of a value
+    # that can be stored in memory. This is used to prevent programs from
+    # using too much memory.
+    # (default: 0)
+    max_variable_size: 0
+
+    # The maximum number of variables that can be stored in memory at once.
+    # (default: 0)
+    max_variables: 0
+
+    # The maximum number of instructions that can be executed before the
+    # program is terminated.
+    # (default: 0)
+    max_stack_size: 0
+
+    # A list of instructions that are disabled, this is used to prevent
+    # programs from using certain instructions.
+    # (default: [])
+    instruction_blacklist:
+        - "eq"
+        - "neq"
+        - "gt"
+        - "gte"
+
+    # A list of packages to import, this is used to import packages that
+    # extend the functionality of RTEX.
+    # (default: [])
+    import_namespaces:
+        - "com.nosial.rtex_filesystem"
+
+# Enabling supervisor mode will allow the runtime to spawn the program
+# as a child process and monitor the resource usage of the child process.
+# This is useful to terminate badly behaving programs. (eg; infinite loops)
+# The supervisor will terminate the child process if it exceeds the
+# resource limits set in the runtime section.
+supervisor:
+
+    # If true, the supervisor will be enabled
+    enabled: true
+
+    # The maximum number of seconds a program can run for
+    max_execution_time: 100 # in seconds
+
+    # The maximum number of seconds a program can use the CPU for
+    max_cpu_time: 100 # in seconds
+
+    # The maximum number of bytes a program can use for memory
+    max_memory: 1000000 # in bytes
+
+
+# Enabling a Redis hook will allow for easier debugging of programs.
+# This will allow you to view the state of the program at any time
+# This works by providing a reference ID to the program as a command-line
+# argument.
+#
+# The engine will then connect to a Redis server and store the state of
+# the program in a Redis hash. This hash will be updated every time the
+# program executes an instruction.
+#
+# Libraries can also use this hook to store data in the Redis hash.
+redis_hook:
+    # If true, the Redis hook will be enabled
+    enabled: True
+
+    # The host of the Redis server
+    host: "127.0.0.1"
+
+    # The port of the Redis server
+    port: 6379
+
+    # The password of the Redis server (optional)
+    password: null
+
+    # If the information should be destroyed when the program exits
+    destroy_on_exit: False

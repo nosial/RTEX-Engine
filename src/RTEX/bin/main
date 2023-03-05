@@ -1,0 +1,14 @@
+<?php
+
+    require 'ncc';
+    import('net.nosial.rtex', 'latest');
+
+    try
+    {
+        \RTEX\RTEX::main();
+    }
+    catch(\Exception $e)
+    {
+        print($e->getMessage() . PHP_EOL);
+        exit(1);
+    }

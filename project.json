@@ -38,7 +38,10 @@
     "build": {
         "source_path": "src",
         "default_configuration": "release",
-        "main_execution": "main",
+        "main": {
+            "policy": "main",
+            "create_symlink": true
+        },
         "define_constants": {
             "ASSEMBLY_NAME": "%ASSEMBLY.NAME%",
             "ASSEMBLY_PACKAGE": "%ASSEMBLY.PACKAGE%",
@@ -57,6 +60,12 @@
                 "version": "latest",
                 "source_type": "remote",
                 "source": "nosial/libs.log=latest@n64"
+            },
+            {
+                "name": "com.cheprasov.php_redis_client",
+                "version": "latest",
+                "source_type": "remote",
+                "source": "cheprasov/php-redis-client=latest@composer"
             }
         ],
         "configurations": [

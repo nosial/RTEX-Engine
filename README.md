@@ -10,13 +10,28 @@ or you are executing programs written by users,
 but you don't want to give them the ability to
 execute arbitrary code on your system
 
+## Table of Contents
+
+<!-- TOC -->
+* [RTEX Engine](#rtex-engine)
+  * [Table of Contents](#table-of-contents)
+  * [How does it work?](#how-does-it-work)
+    * [Instructions](#instructions)
+    * [Methods & Namespaces](#methods--namespaces)
+  * [Builtin Instruction Sets](#builtin-instruction-sets)
+* [License](#license)
+* [Contributing](#contributing)
+<!-- TOC -->
+
+-----------------------------------------------------------------------------
+
 ## How does it work?
 
 RTEX Engine operates on the simple principle of executing
 instructions in order, and then moving on to the next
 instruction. 
 
-
+[README.md](README.md)
 ### Instructions
 
 Instructions are simply associative arrays that contain
@@ -34,8 +49,6 @@ allowing for basic functionality and operations, the builtin
 functions do not provide a way to interact with the host
 system or the filesystem, but you can extend the engine
 with your own methods and namespaces
-
-#### JSON Representation
 
 Since instructions are associative arrays, they can be
 represented in JSON, which is a common format for data
@@ -86,6 +99,7 @@ instructions that is shown above in JSON format:
 ]
 ```
 
+
 ### Methods & Namespaces
 
 Methods are different to instructions in the terms
@@ -106,6 +120,18 @@ when they are invoked.
 ***Note:*** This functionality is a WIP, more
 information will be added as it is implemented
 
+-----------------------------------------------------------------------------
+
+## Builtin Instruction Sets
+
+RTEX Engine comes with a limited set of instructions by default,
+but you can extend the engine with your own methods and namespaces
+
+ - base
+    - [get](docs/instructions/base/get.md)
+    - [set](docs/instructions/base/get.md)
+ - math
+    - [add](docs/instructions/add.md)
 
 # License
 
